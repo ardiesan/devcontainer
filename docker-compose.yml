@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  rnn-devcont:
+    build:
+      context: .
+      dockerfile: JVM.Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME:-rd-java17env}
+    volumes: # https://github.com/microsoft/vscode-remote-release/issues/7946
+      - .:/home/vscode/project:cached
+    command: sleep infinity
+
+  rnn-mysqldb:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    networks:
+      - rnn-network
+
+  rnn-mongodb:
+    image: mongo:6-jammy
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mysql-data:
+  mongo-data:
+
+networks:
+  rnn-network:
+    driver: bridge
