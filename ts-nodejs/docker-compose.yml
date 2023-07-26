@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  rd-devcont:
+    image: ardiesan/nestjs:0.1
+    volumes: # https://github.com/microsoft/vscode-remote-release/issues/7946
+      - .:/home/${NODE_USER}/project:cached
+    command: sleep infinity
+    networks:
+      rd-network:
+        ipv4_address: 172.16.0.10
+          #    links:
+          #      #  - "rd-mysqldb:mysqldb"
+          #
+        #  rd-mysqldb:
+        #    image: mysql:8.0
+        #    command: --default-authentication-plugin=mysql_native_password
+        #    restart: always
+        #    volumes:
+        #      - mysql-data:/var/lib/mysql
+        #    environment:
+        #      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        #      MYSQL_DATABASE: ${MYSQL_DATABASE}
+        #      MYSQL_USER: ${MYSQL_USER}
+        #      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        #    ports:
+        #      - "3306:3306"
+        #    networks:
+        #      rd-network:
+        #        ipv4_address: 172.16.0.11
+
+volumes:
+  mysql-data:
+
+networks:
+  rd-network:
+    name: rd-network
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "172.16.0.1"
+    ipam:
+      config:
+        - subnet: "172.16.0.0/16"
