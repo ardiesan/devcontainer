@@ -1,18 +1,21 @@
 version: '3.8'
 services:
-  rnn-devcont:
+  rd-devcont:
     build:
       context: .
-      dockerfile: JVM.Dockerfile
-    container_name: ${COMPOSE_PROJECT_NAME:-rd-java17env}
+      dockerfile: Dockerfile
+        #    container_name: ${COMPOSE_PROJECT_NAME:-rd-java17env}
     volumes: # https://github.com/microsoft/vscode-remote-release/issues/7946
       - .:/home/vscode/project:cached
     command: sleep infinity
+      #    links: # link the other services within top-level network
+      #      - rd-mysqldb
+      #      - rd-mongodb
     networks:
-      - rnn-network
+      - rd-java-network
 
-  rnn-mysqldb:
-    image: mysql:8.0
+  rd-mysqldb:
+    image: mysql/mysql-server:8.0
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     volumes:
@@ -22,23 +25,31 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "3306:3306"
+        #    ports:
+        #      - "3306:3306"
     networks:
-      - rnn-network
+      - rd-java-network
 
-  rnn-mongodb:
+  rd-mongodb:
     image: mongo:6-jammy
     restart: always
-    ports:
-      - '27017:27017'
     volumes:
       - mongo-data:/data/db
+      #    ports:
+      #      - '27017:27017'
+    networks:
+      - rd-java-network
 
 volumes:
   mysql-data:
   mongo-data:
 
 networks:
-  rnn-network:
+  rd-java-network:
+    name: rd-java-network
     driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "172.22.0.1"
+    ipam:
+      config:
+        - subnet: "172.22.0.1/16"
