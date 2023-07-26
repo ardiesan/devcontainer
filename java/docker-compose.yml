@@ -8,6 +8,8 @@ services:
     volumes: # https://github.com/microsoft/vscode-remote-release/issues/7946
       - .:/home/vscode/project:cached
     command: sleep infinity
+    networks:
+      - rnn-network
 
   rnn-mysqldb:
     image: mysql:8.0

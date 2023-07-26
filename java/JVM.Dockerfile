@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/devcontainers/java:17-bookworm
 SHELL ["/bin/bash", "-lc"]
 
 RUN apt-get update && apt-get -y upgrade
-RUN apt install curl git
+RUN apt -y install curl git mariadb-client
 
 USER vscode
 RUN cd ~
